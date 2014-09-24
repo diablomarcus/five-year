@@ -54,6 +54,29 @@ router.route('/entries/:entry_id')
             }
         });
     })
+    .put(function(request, response) {
+        Entry.findById(request.params.entry_id, function (err, entry) {
+            if (err) {
+                response.send(err);
+                return;
+            }
+            if (entry) {
+                if (entry.owner !== request.body.owner) {
+                    response.status(400).send('Cannot update owner');
+                    return;
+                }
+                entry.text = request.body.text;
+                entry.save(function(err) {
+                    if (err) {
+                        response.send(err);
+                    }
+                    response.json(entry);
+                });
+            } else {
+                response.status(404).send('Unable to find entry');
+            }
+        });
+    })
     .delete(function(request, response) {
         Entry.remove({
             _id: request.params.entry_id

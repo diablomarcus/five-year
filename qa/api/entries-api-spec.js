@@ -44,6 +44,17 @@
         text: uuid.v1(),
         owner: uuid.v1()
     };
+
+    var entryToUpdate = {
+        text: uuid.v1(),
+        owner: entryToCreate.owner
+    };
+
+    var entryWithUpdatedOwner = {
+        text: uuid.v1(),
+        owner: uuid.v1()
+    };
+
     frisby.create('create on entries')
     .post(entriesUrl, entryToCreate, {json: true})
     .expectStatus(201)
@@ -60,6 +71,23 @@
         frisby.create('Can find created entry by url')
         .get(entryUrl)
         .expectJSON(entryToCreate)
+        .expectStatus(200)
+        .toss();
+
+        frisby.create('Can update entry')
+        .put(entryUrl, entryToUpdate, {json: true})
+        .expectStatus(200)
+        .expectJSON(entryToUpdate)
+        .toss();
+
+        frisby.create('Cannot update owner')
+        .put(entryUrl, entryWithUpdatedOwner, {json: true})
+        .expectStatus(400)
+        .toss();
+
+        frisby.create('Can find updated entry by url')
+        .get(entryUrl)
+        .expectJSON(entryToUpdate)
         .expectStatus(200)
         .toss();
 
